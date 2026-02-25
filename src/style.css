@@ -1,0 +1,75 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+.prose-tight {
+  font-size: 0.875rem;
+  --tw-prose-spacing: 0.75em;
+
+  & > * + * {
+    margin-top: var(--tw-prose-spacing);
+  }
+
+  & h1,
+  & h2,
+  & h3,
+  & h4 {
+    margin-top: 1.25em;
+    margin-bottom: 0.5em;
+  }
+
+  & h1:first-child {
+    margin-top: 0;
+  }
+
+  & p {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+  }
+
+  & ul,
+  & ol {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    padding-left: 1.25em;
+  }
+
+  & li {
+    margin-top: 0.25em;
+    margin-bottom: 0.25em;
+  }
+
+  & pre {
+    margin-top: 0.75em;
+    margin-bottom: 0.75em;
+  }
+
+  & blockquote {
+    margin-top: 0.75em;
+    margin-bottom: 0.75em;
+  }
+}
+
+@media print {
+  .drop-zone {
+    display: none !important;
+  }
+
+  .print-hidden {
+    display: none !important;
+  }
+
+  body {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .prose {
+    max-width: none !important;
+  }
+}
+
+@media screen {
+  .screen-hidden {
+    display: none !important;
+  }
+}
