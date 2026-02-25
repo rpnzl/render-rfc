@@ -1,26 +1,26 @@
 import './style.css'
-import { marked } from 'marked'
+import { marked, Renderer, type Tokens } from 'marked'
 import mermaid from 'mermaid'
 
 mermaid.initialize({ startOnLoad: false, theme: 'neutral' })
 
-const app = document.querySelector('#app')
+const app = document.querySelector<HTMLDivElement>('#app')!
 
-const renderer = new marked.Renderer()
+const renderer = new Renderer()
 const originalCodeRenderer = renderer.code.bind(renderer)
 
-renderer.code = function ({ text, lang }) {
-  if (lang === 'mermaid') {
-    return `<div class="mermaid">${text}</div>`
+renderer.code = function (token: Tokens.Code) {
+  if (token.lang === 'mermaid') {
+    return `<div class="mermaid">${token.text}</div>`
   }
-  return originalCodeRenderer({ text, lang })
+  return originalCodeRenderer(token)
 }
 
 marked.setOptions({ renderer })
 
-async function renderApp(content = null) {
+async function renderApp(content: string | null = null) {
   if (content) {
-    const html = marked.parse(content)
+    const html = await marked.parse(content)
     app.innerHTML = `
       <article class="prose prose-sm prose-slate prose-tight max-w-none p-8 lg:p-12 print:p-0">
         ${html}
@@ -36,13 +36,13 @@ async function renderApp(content = null) {
     // Set document title from first H1
     const h1 = app.querySelector('h1')
     if (h1) {
-      document.title = h1.textContent
+      document.title = h1.textContent!
     }
 
     // Render mermaid diagrams
     await mermaid.run({ querySelector: '.mermaid' })
 
-    document.getElementById('reset-btn').addEventListener('click', () => {
+    document.getElementById('reset-btn')!.addEventListener('click', () => {
       document.title = 'Markdown Renderer'
       renderApp()
     })
@@ -78,15 +78,16 @@ async function renderApp(content = null) {
 }
 
 function setupDropZone() {
-  const dropZone = document.getElementById('drop-zone')
-  const fileInput = document.getElementById('file-input')
-  const browseBtn = document.getElementById('browse-btn')
-  const dropArea = dropZone.querySelector('div')
+  const dropZone = document.getElementById('drop-zone')!
+  const fileInput = document.getElementById('file-input') as HTMLInputElement
+  const browseBtn = document.getElementById('browse-btn')!
+  const dropArea = dropZone.querySelector('div')!
 
   browseBtn.addEventListener('click', () => fileInput.click())
   fileInput.addEventListener('change', (e) => {
-    if (e.target.files[0]) {
-      handleFile(e.target.files[0])
+    const target = e.target as HTMLInputElement
+    if (target.files?.[0]) {
+      handleFile(target.files[0])
     }
   })
 
@@ -106,14 +107,14 @@ function setupDropZone() {
 
   dropZone.addEventListener('drop', (e) => {
     e.preventDefault()
-    const file = e.dataTransfer.files[0]
+    const file = (e as DragEvent).dataTransfer?.files[0]
     if (file) {
       handleFile(file)
     }
   })
 }
 
-function handleFile(file) {
+function handleFile(file: File) {
   if (!file.name.match(/\.(md|markdown)$/i)) {
     alert('Please drop a Markdown file (.md or .markdown)')
     return
@@ -121,7 +122,7 @@ function handleFile(file) {
 
   const reader = new FileReader()
   reader.onload = (e) => {
-    renderApp(e.target.result)
+    renderApp(e.target!.result as string)
   }
   reader.readAsText(file)
 }
